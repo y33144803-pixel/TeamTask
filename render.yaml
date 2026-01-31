@@ -2,8 +2,13 @@ services:
   - type: web
     name: TeamTask-Frontend
     runtime: static
-    buildCommand: cd team-tasks && npm install && npm run build
-    staticPublishPath: team-tasks/dist/team-tasks/browser
+    rootDir: team-tasks
+    buildCommand: npm install && npm run build --configuration production
+    staticPublishPath: dist/team-tasks
+    headers:
+      - path: /*
+        name: Cache-Control
+        value: public, max-age=0, must-revalidate
     routes:
       - type: rewrite
         source: /*
