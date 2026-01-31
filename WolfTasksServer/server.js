@@ -3,6 +3,8 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 import './src/db.js';
 import authRouter from './src/routes/auth.js';
@@ -12,6 +14,7 @@ import tasksRouter from './src/routes/tasks.js';
 import commentsRouter from './src/routes/comments.js';
 import usersRouter from './src/routes/users.js';
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
 
 app.use(helmet());
@@ -30,9 +33,13 @@ app.use('/api/tasks', tasksRouter);
 app.use('/api/comments', commentsRouter);
 app.use('/api/users', usersRouter);
 
-// 404
-app.use((req, res) => {
-  res.status(404).json({ error: 'Not Found', path: req.path });
+// Serve Angular Frontend Static Files
+const frontendPath = path.join(__dirname, '../team-tasks/dist/team-tasks/browser');
+app.use(express.static(frontendPath));
+
+// SPA Fallback - לכל בקשה שלא תופסת API, חזור ל-index.html
+app.get('*', (_req, res) => {
+  res.sendFile(path.join(frontendPath, 'index.html'));
 });
 
 // Error handler
