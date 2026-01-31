@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: TeamTask-Frontend
+    runtime: static
+    buildCommand: cd team-tasks && npm install && npm run build
+    staticPublishPath: team-tasks/dist/team-tasks/browser
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
