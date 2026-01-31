@@ -1,0 +1,106 @@
+@let currentState = state$ | async;
+
+<div class="teams-container">
+  <div class="teams-header">
+    <h2>הצוותים שלי</h2>
+    <button 
+      mat-raised-button 
+      color="primary" 
+      (click)="showForm = !showForm" 
+      *ngIf="!showForm">
+      + צור צוות חדש
+    </button>
+  </div>
+
+  @if (showForm) {
+    <app-new-team-form 
+      (create)="onCreateTeam($event)" 
+      (cancel)="onCancelCreate()">
+    </app-new-team-form>
+  }
+
+  @if (currentState?.loading) {
+    <div class="loading-container">
+      <mat-progress-spinner 
+        mode="indeterminate" 
+        diameter="50" 
+        color="primary">
+      </mat-progress-spinner>
+      <p>טוען צוותים...</p>
+    </div>
+  }
+
+  @if (!!currentState?.error) {
+    <mat-card class="error-card">
+      <mat-card-content>
+        <span>{{ currentState?.error }}</span>
+      </mat-card-content>
+    </mat-card>
+  }
+
+  @if (!currentState?.loading && !currentState?.error && (currentState?.teams?.length ?? 0) > 0) {
+    <div class="teams-grid">
+      @for (team of currentState?.teams ?? []; track team.id) {
+        <mat-card class="team-card" (click)="navigateToProjects(team.id)">
+          <mat-card-content>
+            <h3 class="team-title">{{ team.name }}</h3>
+            
+            <div class="team-info">
+              <div class="info-item">
+                <span class="info-label">חברים:</span>
+                <span class="info-value">{{ team.members_count || 0 }}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">נוצר:</span>
+                <span class="info-value">
+                  {{ team.created_at ? (team.created_at | date:'dd/MM/yyyy') : 'לא ידוע' }}
+                </span>
+              </div>
+            </div>
+            
+            <div class="card-actions">
+              <button 
+                mat-raised-button 
+                color="primary"
+                (click)="navigateToProjects(team.id); $event.stopPropagation()">
+                פתח פרויקטים
+              </button>
+              <button 
+                mat-button
+                (click)="openAddMember(team); $event.stopPropagation()"
+                *ngIf="selectedTeamId !== team.id">
+                הוסף חבר
+              </button>
+            </div>
+          </mat-card-content>
+          
+          @if (selectedTeamId === team.id) {
+            <mat-divider></mat-divider>
+            <mat-card-content (click)="$event.stopPropagation()">
+              <app-team-members 
+                [teamId]="team.id"
+                (memberAdded)="onMemberAdded()"
+                (cancel)="closeAddMember()">
+              </app-team-members>
+            </mat-card-content>
+          }
+        </mat-card>
+      }
+    </div>
+  }
+
+  @if (!currentState?.loading && !currentState?.error && (currentState?.teams?.length ?? 0) === 0) {
+    <mat-card class="empty-state">
+      <mat-card-content>
+        <h3>עדיין אין לך צוותים</h3>
+        <p>צור צוות ראשון שלך כדי להתחיל לנהל פרויקטים ומשימות</p>
+        <button 
+          mat-raised-button 
+          color="primary" 
+          (click)="showForm = true">
+          + צור צוות ראשון
+        </button>
+      </mat-card-content>
+    </mat-card>
+  }
+</div>

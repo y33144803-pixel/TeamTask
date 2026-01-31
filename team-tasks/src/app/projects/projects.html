@@ -1,0 +1,157 @@
+@let currentProjects = projects();
+@let currentError = error();
+@let isLoading = loading();
+
+<div class="projects-container">
+  <div class="projects-header">
+    <div class="header-title">
+      <button mat-icon-button (click)="goBack()" title="חזרה">
+        <mat-icon>arrow_forward</mat-icon>
+      </button>
+      <h2>פרויקטים</h2>
+    </div>
+    <button 
+      mat-raised-button 
+      color="primary" 
+      (click)="showForm = !showForm" 
+      *ngIf="!showForm">
+      + צור פרויקט חדש
+    </button>
+  </div>
+
+  @if (showForm) {
+    <app-new-project-form
+      [teamId]="teamId!"
+      (create)="onAddProject($event)"
+      (cancel)="showForm = false">
+    </app-new-project-form>
+  }
+
+  @if (isLoading) {
+    <div class="loading-container">
+      <mat-progress-spinner 
+        mode="indeterminate" 
+        diameter="50" 
+        color="primary">
+      </mat-progress-spinner>
+      <p>טוען פרויקטים...</p>
+    </div>
+  }
+
+  @if (currentError) {
+    <mat-card class="error-card">
+      <mat-card-content>
+        <span>{{ currentError }}</span>
+        <button mat-button (click)="clearError()">✕</button>
+      </mat-card-content>
+    </mat-card>
+  }
+
+  @if (!isLoading && !currentError && currentProjects.length > 0) {
+    <div class="projects-grid">
+      @for (project of currentProjects; track project.id) {
+        <mat-card class="project-card">
+          <mat-card-content (click)="navigateToTasks(project.id)">
+            <h3 class="project-title">{{ project.name }}</h3>
+            
+            @if (project.description) {
+              <p class="project-description">{{ project.description }}</p>
+            }
+            
+            <div class="project-info">
+              <div class="info-item">
+                <span class="info-label">נוצר:</span>
+                <span class="info-value">
+                  {{ project.createdAt ? (project.createdAt | date:'dd/MM/yyyy HH:mm') : 'לא ידוע' }}
+                </span>
+              </div>
+              @if (project.status) {
+                <div class="info-item">
+                  <span class="info-label">סטטוס:</span>
+                  <span class="info-value status-{{ project.status }}">
+                    {{ getStatusText(project.status) }}
+                  </span>
+                </div>
+              }
+            </div>
+          </mat-card-content>
+          
+          <mat-card-actions>
+            <button 
+              mat-raised-button 
+              color="primary"
+              (click)="navigateToTasks(project.id)">
+              פתח משימות
+            </button>
+            <button 
+              mat-button
+              (click)="onEditProject(project); $event.stopPropagation()">
+              ערוך
+            </button>
+            <button 
+              mat-button
+              color="warn"
+              (click)="onRemoveProject(project.id); $event.stopPropagation()">
+              מחק
+            </button>
+          </mat-card-actions>
+        </mat-card>
+      }
+    </div>
+  }
+
+  @if (!isLoading && !currentError && currentProjects.length === 0) {
+    <mat-card class="empty-state">
+      <mat-card-content>
+        <h3>עדיין אין פרויקטים בצוות זה</h3>
+        <p>צור פרויקט ראשון כדי להתחיל לנהל משימות</p>
+        <button 
+          mat-raised-button 
+          color="primary" 
+          (click)="showForm = true">
+          + צור פרויקט ראשון
+        </button>
+      </mat-card-content>
+    </mat-card>
+  }
+  
+  <!-- דיאלוג עריכה -->
+  @if (editingProject()) {
+    <div class="edit-overlay" (click)="cancelEdit()">
+      <mat-card class="edit-dialog" (click)="$event.stopPropagation()">
+        <mat-card-header>
+          <mat-card-title>ערוך פרויקט</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="form-field">
+            <label for="editName">שם הפרויקט:</label>
+            <input 
+              type="text"
+              id="editName"
+              [(ngModel)]="editData.name" 
+              class="project-input"
+            >
+          </div>
+          
+          <div class="form-field">
+            <label for="editDesc">תיאור:</label>
+            <textarea 
+              id="editDesc"
+              [(ngModel)]="editData.description" 
+              rows="3"
+              class="project-textarea">
+            </textarea>
+          </div>
+        </mat-card-content>
+        <mat-card-actions>
+          <button mat-raised-button color="primary" (click)="saveEdit()">
+            שמור
+          </button>
+          <button mat-button (click)="cancelEdit()">
+            ביטול
+          </button>
+        </mat-card-actions>
+      </mat-card>
+    </div>
+  }
+</div>

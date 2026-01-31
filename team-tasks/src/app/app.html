@@ -1,0 +1,73 @@
+<!-- Global Loading Spinner -->
+@if (loadingService.isLoading()) {
+  <div class="global-loading-overlay">
+    <mat-spinner diameter="50"></mat-spinner>
+    <p>טוען...</p>
+  </div>
+}
+
+<!-- Header -->
+<mat-toolbar color="primary" class="app-toolbar">
+  <span class="app-title">{{ title() }}</span>
+  <span class="spacer"></span>
+  
+  <!-- Navigation Links - רק אם מחובר -->
+  @if (isAuthenticated()) {
+    <nav class="nav-links">
+      <a mat-button routerLink="/teams" routerLinkActive="active-link"
+         [routerLinkActiveOptions]="{exact: false}">
+        צוותים
+      </a>
+      <!-- <a mat-button routerLink="/projects" routerLinkActive="active-link">
+        פרויקטים
+      </a>
+      <a mat-button routerLink="/tasks" routerLinkActive="active-link">
+        משימות
+      </a> -->
+    </nav>
+  }
+  
+  <!-- Auth Buttons - רק אם לא מחובר -->
+  @if (!isAuthenticated()) {
+    <div class="auth-buttons">
+      <a mat-button routerLink="/auth/login" class="login-btn">
+        התחברות
+      </a>
+      <a mat-button routerLink="/auth/register" class="register-btn">
+        הרשמה
+      </a>
+    </div>
+  }
+  
+  <!-- User Menu - רק אם מחובר -->
+  @if (isAuthenticated()) {
+    <div class="user-section">
+      <button mat-button [matMenuTriggerFor]="userMenu" class="user-button">
+        {{ currentUser()?.name || 'משתמש' }}
+        <mat-icon>arrow_drop_down</mat-icon>
+      </button>
+      
+      <mat-menu #userMenu="matMenu" xPosition="before">
+        <div class="user-menu-header">
+          <div class="user-menu-name">{{ currentUser()?.name }}</div>
+          <div class="user-menu-email">{{ currentUser()?.email }}</div>
+        </div>
+        
+        <mat-divider></mat-divider>
+        
+        <button mat-menu-item (click)="onSwitchUser()">
+          החלף משתמש
+        </button>
+        
+        <button mat-menu-item (click)="onLogout()">
+          התנתק
+        </button>
+      </mat-menu>
+    </div>
+  }
+</mat-toolbar>
+
+<!-- Main Content -->
+<main class="main-content">
+  <router-outlet></router-outlet>
+</main>

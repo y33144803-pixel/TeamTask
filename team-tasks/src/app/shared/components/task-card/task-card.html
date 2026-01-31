@@ -1,0 +1,217 @@
+<mat-card class="task-card" [class.overdue]="isOverdue()" [class.editing]="isEditing">
+  
+  <!-- מצב צפייה רגיל -->
+  <div *ngIf="!isEditing">
+    <mat-card-header>
+      <mat-card-title>
+        <div class="task-title-row">
+          <span class="task-title">{{ task.title }}</span>
+          <div class="action-buttons">
+            <button mat-icon-button (click)="startEdit()" matTooltip="ערוך משימה">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-icon-button color="warn" (click)="onDelete()" matTooltip="מחק משימה">
+              <mat-icon>delete</mat-icon>
+            </button>
+            <button 
+              mat-icon-button 
+              (click)="toggleComments()" 
+              [matTooltip]="showComments ? 'הסתר תגובות' : 'הצג תגובות'">
+              <mat-icon>{{ showComments ? 'visibility_off' : 'comment' }}</mat-icon>
+            </button>
+          </div>
+        </div>
+      </mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      <p *ngIf="task.description" class="task-description">
+        {{ task.description }}
+      </p>
+
+      <div class="task-chips">
+        <mat-chip *ngIf="task.priority" [color]="getPriorityColor()" highlighted>
+          <mat-icon>{{ getPriorityIcon() }}</mat-icon>
+          {{ getPriorityText() }}
+        </mat-chip>
+
+        <mat-chip [style.background-color]="getStatusColor()" [style.color]="'white'" highlighted>
+          {{ getStatusText() }}
+        </mat-chip>
+      </div>
+
+      <div *ngIf="task.dueDate" class="task-due-date" [class.overdue-text]="isOverdue()">
+        <mat-icon>event</mat-icon>
+        <span>{{ formatDate(task.dueDate) }}</span>
+      </div>
+
+      <div *ngIf="task.assigneeName" class="task-assigned">
+        <mat-icon>person</mat-icon>
+        <span>{{ task.assigneeName }}</span>
+      </div>
+    </mat-card-content>
+
+    <mat-card-actions>
+      <div class="status-buttons">
+        <button 
+          mat-raised-button 
+          color="warn"
+          [disabled]="task.status === 'todo'"
+          (click)="onStatusChange('todo')">
+          לביצוע
+        </button>
+        <button 
+          mat-raised-button 
+          color="accent"
+          [disabled]="task.status === 'in_progress'"
+          (click)="onStatusChange('in_progress')">
+          בתהליך
+        </button>
+        <button 
+          mat-raised-button 
+          color="primary"
+          [disabled]="task.status === 'done'"
+          (click)="onStatusChange('done')">
+          הושלם
+        </button>
+      </div>
+    </mat-card-actions>
+
+    <!-- הצגת תגובות במצב צפייה -->
+    <div class="comments-section" *ngIf="showComments && task.id">
+      <mat-divider></mat-divider>
+      <div class="comments-header">
+        <h3 class="comments-title">
+          <mat-icon>comment</mat-icon>
+          הוראות ותגובות
+        </h3>
+      </div>
+      <app-comments [taskId]="task.id.toString()"></app-comments>
+    </div>
+  </div>
+
+  <!-- מצב עריכה -->
+  <div *ngIf="isEditing" class="edit-mode">
+    <mat-card-header>
+      <mat-card-title>
+        <div class="edit-title-row">
+          <div class="title-with-icon">
+            <mat-icon>edit</mat-icon>
+            <span>עריכת משימה</span>
+          </div>
+          <button mat-icon-button (click)="cancelEdit()" matTooltip="ביטול">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+      </mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      <form class="edit-form">
+        <!-- כותרת -->
+        <mat-form-field appearance="fill" class="full-width">
+          <mat-label>כותרת המשימה</mat-label>
+          <mat-icon matIconPrefix>title</mat-icon>
+          <input 
+            matInput 
+            [(ngModel)]="editData.title" 
+            name="title" 
+            placeholder="הזן כותרת"
+            required
+            dir="auto">
+        </mat-form-field>
+
+        <!-- תיאור -->
+        <mat-form-field appearance="fill" class="full-width">
+          <mat-label>תיאור המשימה</mat-label>
+          <mat-icon matIconPrefix>description</mat-icon>
+          <textarea 
+            matInput 
+            [(ngModel)]="editData.description" 
+            name="description"
+            placeholder="הזן תיאור מפורט"
+            rows="4"
+            dir="auto"
+            cdkTextareaAutosize
+            cdkAutosizeMinRows="4"
+            cdkAutosizeMaxRows="10">
+          </textarea>
+        </mat-form-field>
+
+        <div class="form-row">
+          <!-- סטטוס -->
+          <mat-form-field appearance="fill" class="half-width">
+            <mat-label>סטטוס</mat-label>
+            <mat-icon matIconPrefix>flag</mat-icon>
+            <mat-select [(ngModel)]="editData.status" name="status">
+              <mat-option *ngFor="let status of statusOptions" [value]="status.value">
+                <div class="select-option">
+                  <mat-icon [style.color]="getStatusColorByValue(status.value)">
+                    {{ getStatusIconByValue(status.value) }}
+                  </mat-icon>
+                  <span>{{ status.label }}</span>
+                </div>
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <!-- עדיפות -->
+          <mat-form-field appearance="fill" class="half-width">
+            <mat-label>עדיפות</mat-label>
+            <mat-icon matIconPrefix>priority_high</mat-icon>
+            <mat-select [(ngModel)]="editData.priority" name="priority">
+              <mat-option *ngFor="let priority of priorityOptions" [value]="priority.value">
+                <div class="select-option">
+                  <mat-icon [class]="'priority-' + priority.value">
+                    {{ priority.icon }}
+                  </mat-icon>
+                  <span>{{ priority.label }}</span>
+                </div>
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <!-- תאריך יעד -->
+        <mat-form-field appearance="fill" class="full-width">
+          <mat-label>תאריך יעד</mat-label>
+          <mat-icon matIconPrefix>event</mat-icon>
+          <input 
+            matInput 
+            [matDatepicker]="picker" 
+            [(ngModel)]="editData.dueDate" 
+            name="dueDate"
+            placeholder="בחר תאריך">
+          <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+        </mat-form-field>
+
+        <!-- הוקצה ל -->
+        <mat-form-field appearance="fill" class="full-width">
+          <mat-label>הוקצה למשתמש</mat-label>
+          <mat-icon matIconPrefix>person</mat-icon>
+          <input 
+            matInput 
+            type="number" 
+            [(ngModel)]="editData.assigneeId" 
+            name="assigneeId"
+            placeholder="הזן מזהה משתמש"
+            dir="ltr">
+        </mat-form-field>
+      </form>
+    </mat-card-content>
+
+    <mat-card-actions>
+      <div class="edit-actions">
+        <button mat-stroked-button (click)="cancelEdit()" class="cancel-btn">
+          <mat-icon>close</mat-icon>
+          <span>ביטול</span>
+        </button>
+        <button mat-raised-button color="primary" (click)="saveEdit()" class="save-btn">
+          <mat-icon>save</mat-icon>
+          <span>שמור שינויים</span>
+        </button>
+      </div>
+    </mat-card-actions>
+  </div>
+</mat-card>

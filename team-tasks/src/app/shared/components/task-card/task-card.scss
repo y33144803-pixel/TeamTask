@@ -1,0 +1,272 @@
+/* כרטיס משימה */
+.task-card {
+  margin-bottom: 16px;
+  transition: all 0.3s ease;
+  border-right: 4px solid #e0e0e0;
+}
+
+.task-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.task-card.overdue {
+  border-right-color: #f44336;
+}
+
+.task-card.editing {
+  border-right-color: #2196f3;
+}
+
+/* כותרת */
+.task-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.task-title {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #333;
+  flex: 1;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+/* תוכן */
+.task-description {
+  margin: 12px 0;
+  color: #666;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+.task-chips {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 12px 0;
+}
+
+.task-due-date,
+.task-assigned {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 8px 0;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.task-due-date mat-icon,
+.task-assigned mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+.overdue-text {
+  color: #f44336;
+  font-weight: 600;
+}
+
+/* כפתורי סטטוס */
+.status-buttons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+  width: 100%;
+}
+
+.status-buttons button {
+  flex: 1;
+  min-width: 80px;
+}
+
+/* תגובות */
+.comments-section {
+  margin-top: 16px;
+  padding-top: 16px;
+}
+
+.comments-header {
+  margin-bottom: 12px;
+}
+
+.comments-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #555;
+}
+
+.comments-title mat-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+
+/* מצב עריכה */
+.edit-mode {
+  padding: 8px 0;
+}
+
+.edit-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.title-with-icon {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #2196f3;
+}
+
+.title-with-icon mat-icon {
+  font-size: 24px;
+  width: 24px;
+  height: 24px;
+}
+
+/* טופס עריכה */
+.edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px 0;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.form-row {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.half-width {
+  flex: 1;
+  min-width: 200px;
+}
+
+/* שדות טופס */
+mat-form-field {
+  font-size: 14px;
+}
+
+mat-form-field mat-icon[matSuffix] {
+  color: #757575;
+}
+
+mat-form-field .mat-mdc-form-field-icon-suffix {
+  padding-left: 12px;
+}
+
+/* textarea */
+textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+/* כפתורי עריכה */
+.edit-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  width: 100%;
+  padding: 8px 0;
+}
+
+.edit-actions button {
+  min-width: 120px;
+}
+
+.edit-actions button mat-icon {
+  margin-left: 6px;
+}
+
+/* אייקונים באופציות */
+mat-option mat-icon {
+  vertical-align: middle;
+  margin-left: 8px;
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .form-row {
+    flex-direction: column;
+  }
+
+  .half-width {
+    width: 100%;
+  }
+
+  .status-buttons {
+    flex-direction: column;
+  }
+
+  .status-buttons button {
+    width: 100%;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+  }
+
+  .edit-actions {
+    flex-direction: column-reverse;
+  }
+
+  .edit-actions button {
+    width: 100%;
+  }
+}
+
+/* RTL Support */
+[dir="rtl"] .task-card {
+  border-right: none;
+  border-left: 4px solid #e0e0e0;
+}
+
+[dir="rtl"] .task-card.overdue {
+  border-left-color: #f44336;
+}
+
+[dir="rtl"] .task-card.editing {
+  border-left-color: #2196f3;
+}
+
+[dir="rtl"] mat-form-field .mat-mdc-form-field-icon-suffix {
+  padding-left: 0;
+  padding-right: 12px;
+}
+
+[dir="rtl"] .edit-actions button mat-icon {
+  margin-left: 0;
+  margin-right: 6px;
+}
+
+[dir="rtl"] mat-option mat-icon {
+  margin-left: 0;
+  margin-right: 8px;
+}

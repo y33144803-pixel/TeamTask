@@ -1,0 +1,43 @@
+<form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+  <h2>התחברות</h2>
+
+  <mat-form-field appearance="fill" style="width:100%; direction: rtl;">
+    <mat-label>אימייל</mat-label>
+    <input matInput formControlName="email" type="email" />
+  </mat-form-field>
+  @if (loginForm.get('email')?.invalid && loginForm.get('email')?.touched) {
+    <div style="color:red;">
+      חובה להזין אימייל תקין
+    </div>
+  }
+
+  <mat-form-field appearance="fill" style="width:100%; direction: rtl;">
+    <mat-label>סיסמה</mat-label>
+    <input matInput formControlName="password" type="password" />
+  </mat-form-field>
+  @if (loginForm.get('password')?.invalid && loginForm.get('password')?.touched) {
+    <div style="color:red;">
+      חובה להזין סיסמה
+    </div>
+  }
+
+  <button mat-raised-button color="primary" type="submit" [disabled]="loginForm.invalid || loading" style="width:100%;">
+    התחבר
+  </button>
+
+  @if (loading) {
+    <div style="color:#338bf1; margin:10px 0;">טוען...</div>
+  }
+
+  @if (error) {
+    <div style="color:red; margin-top:10px;">
+      {{ error }}
+    </div>
+    <div style="margin-bottom: 10px;">
+      <span>עוד לא רשמת חשבון?</span>
+      <button mat-button color="accent" type="button" (click)="goToRegister()">
+        מעבר לעמוד הרשמה
+      </button>
+    </div>
+  }
+</form>

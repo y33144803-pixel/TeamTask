@@ -1,0 +1,56 @@
+<form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+  <h2>הרשמה</h2>
+  
+  <mat-form-field appearance="fill" style="width:100%; direction: rtl;">
+    <mat-label>שם</mat-label>
+    <input matInput formControlName="name" type="text" />
+  </mat-form-field>
+  @if (registerForm.get('name')?.invalid && registerForm.get('name')?.touched) {
+    <div style="color:red;">
+      שדה שם הוא חובה
+    </div>
+  }
+
+  <mat-form-field appearance="fill" style="width:100%; direction: rtl;">
+    <mat-label>אימייל</mat-label>
+    <input matInput formControlName="email" type="email" />
+  </mat-form-field>
+  @if (registerForm.get('email')?.invalid && registerForm.get('email')?.touched) {
+    <div style="color:red;">
+      פורמט אימייל לא תקין
+    </div>
+  }
+
+  <mat-form-field appearance="fill" style="width:100%; direction: rtl;">
+    <mat-label>סיסמה</mat-label>
+    <input matInput formControlName="password" type="password" />
+  </mat-form-field>
+  @if (registerForm.get('password')?.invalid && registerForm.get('password')?.touched) {
+    <div style="color:red;">
+      שדה סיסמה נדרש
+    </div>
+  }
+
+  <button mat-raised-button color="primary"
+    type="submit"
+    [disabled]="registerForm.invalid || loading"
+    style="width:100%;">
+    הרשמה
+  </button>
+
+  @if (loading) {
+    <div style="color:#338bf1; margin:10px 0;">טוען...</div>
+  }
+
+  @if (error) {
+    <div style="color:red; margin-top:10px;">
+      {{ error }}
+    </div>
+    <div style="margin-bottom: 10px;">
+      <span>כבר רשום?</span>
+      <button mat-button color="accent" type="button" (click)="goToLogin()">
+        מעבר למסך התחברות
+      </button>
+    </div>
+  }
+</form>

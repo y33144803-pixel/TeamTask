@@ -1,0 +1,130 @@
+@let currentTasks = tasks();
+@let currentError = error();
+@let isLoading = loading();
+
+<div class="tasks-container">
+  <div class="tasks-header">
+    <div class="header-title">
+      <button mat-icon-button (click)="goBack()" title="חזרה">
+        <mat-icon>arrow_forward</mat-icon>
+      </button>
+      <h2>משימות</h2>
+    </div>
+    <button 
+      mat-raised-button 
+      color="primary" 
+      (click)="showForm = !showForm" 
+      *ngIf="!showForm">
+      + משימה חדשה
+    </button>
+  </div>
+
+  @if (showForm) {
+    <app-new-task-form
+      (save)="onAddTask($event)"
+      (cancel)="showForm = false">
+    </app-new-task-form>
+  }
+
+  @if (isLoading) {
+    <div class="loading-container">
+      <mat-progress-spinner 
+        mode="indeterminate" 
+        diameter="50" 
+        color="primary">
+      </mat-progress-spinner>
+      <p>טוען משימות...</p>
+    </div>
+  }
+
+  @if (currentError) {
+    <mat-card class="error-card">
+      <mat-card-content>
+        <span>{{ currentError }}</span>
+        <button mat-button (click)="clearError()">✕</button>
+      </mat-card-content>
+    </mat-card>
+  }
+
+  @if (!isLoading && !currentError) {
+    <div class="kanban-board">
+      <!-- To Do Column -->
+      <div class="kanban-column">
+        <div class="column-header todo-header">
+          <h3>לביצוע</h3>
+          <span class="task-count">{{ getTodoTasks().length }}</span>
+        </div>
+        <div class="column-content">
+          @for (task of getTodoTasks(); track task.id) {
+            <app-task-card
+              [task]="task"
+              (delete)="onDeleteTask(task.id)"
+              (update)="onUpdateTask(task.id, $event)"
+              (statusChange)="onChangeStatus(task.id, $event)">
+            </app-task-card>
+          }
+          @if (getTodoTasks().length === 0) {
+            <div class="empty-column">אין משימות</div>
+          }
+        </div>
+      </div>
+
+      <!-- In Progress Column -->
+      <div class="kanban-column">
+        <div class="column-header progress-header">
+          <h3>בתהליך</h3>
+          <span class="task-count">{{ getInProgressTasks().length }}</span>
+        </div>
+        <div class="column-content">
+          @for (task of getInProgressTasks(); track task.id) {
+            <app-task-card
+              [task]="task"
+              (delete)="onDeleteTask(task.id)"
+              (update)="onUpdateTask(task.id, $event)"
+              (statusChange)="onChangeStatus(task.id, $event)">
+            </app-task-card>
+          }
+          @if (getInProgressTasks().length === 0) {
+            <div class="empty-column">אין משימות</div>
+          }
+        </div>
+      </div>
+
+      <!-- Done Column -->
+      <div class="kanban-column">
+        <div class="column-header done-header">
+          <h3>הושלם</h3>
+          <span class="task-count">{{ getDoneTasks().length }}</span>
+        </div>
+        <div class="column-content">
+          @for (task of getDoneTasks(); track task.id) {
+            <app-task-card
+              [task]="task"
+              (delete)="onDeleteTask(task.id)"
+              (update)="onUpdateTask(task.id, $event)"
+              (statusChange)="onChangeStatus(task.id, $event)">
+            </app-task-card>
+          }
+          @if (getDoneTasks().length === 0) {
+            <div class="empty-column">אין משימות</div>
+          }
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (!isLoading && !currentError && currentTasks.length === 0) {
+    <mat-card class="empty-state">
+      <mat-card-content>
+        <h3>עדיין אין משימות בפרויקט זה</h3>
+        <p>צור משימה ראשונה כדי להתחיל</p>
+        <button 
+          mat-raised-button 
+          color="primary" 
+          (click)="showForm = true">
+          + צור משימה ראשונה
+        </button>
+      </mat-card-content>
+    </mat-card>
+  }
+</div>

@@ -1,0 +1,121 @@
+<div class="comments-section">
+  <div class="comments-header">
+    <h3>תגובות ({{ topLevelComments().length }})</h3>
+  </div>
+
+  <!-- Error Message -->
+  @if (errorMessage()) {
+    <div class="error-message">
+      <span>{{ errorMessage() }}</span>
+      <button class="close-btn" (click)="clearError()" aria-label="סגור">✕</button>
+    </div>
+  }
+
+  <!-- New Comment Form -->
+  <div class="comment-form">
+    <div class="input-container">
+      <!-- Reply Indicator -->
+      @if (replyToCommentId()) {
+        <div class="reply-indicator">
+          <span>משיב ל-{{ replyToComment()?.authorName }}</span>
+          <button class="cancel-btn" (click)="cancelReply()" title="ביטול">✕</button>
+        </div>
+      }
+
+      <textarea
+        [value]="newCommentText()"
+        (input)="newCommentText.set($any($event.target).value)"
+        placeholder="הוסף תגובה..."
+        rows="3"
+        class="comment-textarea"
+        (keydown.control.enter)="submitComment()"
+        [attr.aria-label]="replyToCommentId() ? 'כתוב תשובה' : 'כתוב תגובה'">
+      </textarea>
+
+      <div class="form-actions">
+        <button 
+          class="btn btn-primary"
+          [disabled]="!newCommentText().trim()"
+          (click)="submitComment()">
+          {{ replyToCommentId() ? 'שלח תשובה' : 'שלח תגובה' }}
+        </button>
+        <span class="shortcut-hint">Ctrl+Enter לשליחה</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  @if (isLoading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>טוען תגובות...</p>
+    </div>
+  } @else {
+    <!-- Comments List -->
+    <div class="comments-list">
+      @for (comment of topLevelComments(); track comment.id) {
+        <div class="comment-thread">
+          <!-- Main Comment -->
+          <div class="comment-item">
+            <div 
+              class="comment-avatar" 
+              [style.background-color]="getAvatarColor(comment.authorId)">
+              {{ getInitials(comment.authorName) }}
+            </div>
+
+            <div class="comment-content">
+              <div class="comment-header">
+                <span class="author-name">{{ comment.authorName }}</span>
+                <span class="comment-time">{{ formatDate(comment.createdAt) }}</span>
+              </div>
+
+              <div class="comment-body">
+                <p class="comment-text">{{ comment.content }}</p>
+
+                <div class="comment-actions">
+                  <button 
+                    class="action-btn"
+                    (click)="startReply(comment.id)"
+                    aria-label="הגב לתגובה">
+                    💬 הגב
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Replies -->
+          @if (getReplies(comment.id).length > 0) {
+            <div class="replies-container">
+              @for (reply of getReplies(comment.id); track reply.id) {
+                <div class="comment-item reply">
+                  <div 
+                    class="comment-avatar" 
+                    [style.background-color]="getAvatarColor(reply.authorId)">
+                    {{ getInitials(reply.authorName) }}
+                  </div>
+
+                  <div class="comment-content">
+                    <div class="comment-header">
+                      <span class="author-name">{{ reply.authorName }}</span>
+                      <span class="comment-time">{{ formatDate(reply.createdAt) }}</span>
+                    </div>
+
+                    <div class="comment-body">
+                      <p class="comment-text">{{ reply.content }}</p>
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      } @empty {
+        <div class="empty-state">
+          <p>עדיין אין תגובות</p>
+          <p class="empty-subtitle">היה הראשון להגיב!</p>
+        </div>
+      }
+    </div>
+  }
+</div>
