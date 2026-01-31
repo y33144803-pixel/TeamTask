@@ -7,10 +7,11 @@ import { Router } from '@angular/router';
 // ⚠️ הסר את ההגדרות המקומיות - ייבא מהמודלים
 import { User } from '../../shared/models/user.model';
 import { AuthResponse, LoginRequest, RegisterRequest } from '../../shared/models/auth.model';
+import { EnvironmentService } from './environment.service';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private readonly apiUrl = 'http://localhost:3000/api/auth';
+  private readonly apiUrl: string;
   
   // Signal למשתמש מחובר
   private currentUserSignal = signal<User | null>(null);
@@ -23,8 +24,10 @@ export class AuthService {
 
   constructor(
     private readonly http: HttpClient,
-    private readonly router: Router
+    private readonly router: Router,
+    private readonly environment: EnvironmentService
   ) {
+    this.apiUrl = `${this.environment.getApiBaseUrl()}/auth`;
     this.loadUserFromStorage();
   }
 

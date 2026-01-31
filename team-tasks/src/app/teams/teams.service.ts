@@ -87,13 +87,19 @@ import {
   TeamMember, 
   AddTeamMemberRequest 
 } from '../shared/models/team.model';
+import { EnvironmentService } from '../core/services/environment.service';
 
 @Injectable({ providedIn: 'root' })
 export class TeamsService {
-  private readonly apiUrl = 'http://localhost:3000/api/teams';
+  private readonly apiUrl: string;
   private readonly defaultTimeout = 15000;
 
-  constructor(private readonly http: HttpClient) {}
+  constructor(
+    private readonly http: HttpClient,
+    private readonly environment: EnvironmentService
+  ) {
+    this.apiUrl = `${this.environment.getApiBaseUrl()}/teams`;
+  }
 
   /**
    * קבלת כל הצוותים של המשתמש

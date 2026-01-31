@@ -190,13 +190,19 @@ import {
   CreateTaskRequest, 
   UpdateTaskRequest 
 } from '../shared/models/task.model';
+import { EnvironmentService } from '../core/services/environment.service';
 
 @Injectable({ providedIn: 'root' })
 export class TasksService {
-  private readonly apiUrl = 'http://localhost:3000/api/tasks';
+  private readonly apiUrl: string;
   private readonly defaultTimeout = 15000;
 
-  constructor(private readonly http: HttpClient) {}
+  constructor(
+    private readonly http: HttpClient,
+    private readonly environment: EnvironmentService
+  ) {
+    this.apiUrl = `${this.environment.getApiBaseUrl()}/tasks`;
+  }
 
   /**
    * קבלת כל המשימות של המשתמש

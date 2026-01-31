@@ -9,13 +9,19 @@ import {
   CreateProjectRequest, 
   UpdateProjectRequest 
 } from '../shared/models/project.model';
+import { EnvironmentService } from '../core/services/environment.service';
 
 @Injectable({ providedIn: 'root' })
 export class ProjectsService {
-  private readonly apiUrl = 'http://localhost:3000/api/projects';
+  private readonly apiUrl: string;
   private readonly defaultTimeout = 15000;
 
-  constructor(private readonly http: HttpClient) {}
+  constructor(
+    private readonly http: HttpClient,
+    private readonly environment: EnvironmentService
+  ) {
+    this.apiUrl = `${this.environment.getApiBaseUrl()}/projects`;
+  }
 
   /**
    * קבלת כל הפרויקטים של המשתמש

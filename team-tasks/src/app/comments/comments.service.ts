@@ -2,6 +2,7 @@ import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, tap, map } from 'rxjs/operators';
+import { EnvironmentService } from '../core/services/environment.service';
 
 export interface Comment {
   id: string;
@@ -36,8 +37,13 @@ interface CommentFromServer {
   providedIn: 'root'
 })
 export class CommentsService {
-  private readonly apiUrl = 'http://localhost:3000/api/comments';
+  private readonly apiUrl: string;
   private http = inject(HttpClient);
+  private environment = inject(EnvironmentService);
+
+  constructor() {
+    this.apiUrl = `${this.environment.getApiBaseUrl()}/comments`;
+  }
 
   // Cache with Signals
   private commentsCache = signal<Map<string, Comment[]>>(new Map());
