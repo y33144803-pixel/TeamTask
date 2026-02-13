@@ -4,7 +4,7 @@ services:
     runtime: static
     rootDir: team-tasks
     buildCommand: npm install && npm run build --configuration production
-    staticPublishPath: dist/team-tasks
+    staticPublishPath: dist/team-tasks/browser
     headers:
       - path: /*
         name: Cache-Control
