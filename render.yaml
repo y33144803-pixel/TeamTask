@@ -7,7 +7,7 @@ services:
     rootDir: WolfTasksServer
     plan: free
     buildCommand: 'cd ../team-tasks && npm install && npm run build --configuration production && cd ../WolfTasksServer && npm ci --omit=dev && npm_config_build_from_source=1 npm rebuild better-sqlite3'
-    startCommand: node seed.js && node server.js
+    startCommand: 'if [ "${SEED}" = "true" ]; then node seed.js; fi; node server.js'
     autoDeploy: true
     envVars:
       - key: NODE_VERSION
