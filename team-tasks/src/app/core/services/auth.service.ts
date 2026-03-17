@@ -75,6 +75,9 @@ export class AuthService {
    * שמירת נתוני אימות ב-localStorage
    */
   private saveAuthData(response: AuthResponse): void {
+    if (!response || !response.token || !response.user) {
+      throw new Error('תגובה לא תקינה מהשרת (חסר token/user)');
+    }
     localStorage.setItem('token', response.token);
     localStorage.setItem('user', JSON.stringify(response.user));
     this.currentUserSignal.set(response.user);
@@ -114,18 +117,23 @@ export class AuthService {
   /**
    * טיפול בשגיאות HTTP
    */
-  private handleError(error: HttpErrorResponse): Observable<never> {
+  private handleError(error: unknown): Observable<never> {
     let errorMessage = 'אירעה שגיאה לא צפויה';
-    
-    if (error.error instanceof ErrorEvent) {
-      // שגיאת client
-      errorMessage = `שגיאה: ${error.error.message}`;
-    } else {
-      // שגיאת server
-      errorMessage = error.error?.message || `שגיאת שרת: ${error.status}`;
+
+    if (error instanceof HttpErrorResponse) {
+      if (error.error instanceof ErrorEvent) {
+        errorMessage = `שגיאה: ${error.error.message}`;
+      } else {
+        errorMessage =
+          (error.error as any)?.message ||
+          (error.error as any)?.error ||
+          `שגיאת שרת: ${error.status}`;
+      }
+    } else if (error instanceof Error) {
+      errorMessage = error.message || errorMessage;
     }
-    
-    console.error('Auth Error:', errorMessage);
+
+    console.error('Auth Error:', errorMessage, error);
     return throwError(() => new Error(errorMessage));
   }
 }

@@ -3,15 +3,20 @@ import db from '../db.js';
 import { signToken } from '../middleware/auth.js';
 
 export function register(req, res) {
-  const { name, email, password } = req.body || {};
-  if (!name || !email || !password) return res.status(400).json({ error: 'name, email, password required' });
-  const existing = db.prepare('SELECT id FROM users WHERE email = ?').get(email);
-  if (existing) return res.status(409).json({ error: 'Email already registered' });
-  const hash = bcrypt.hashSync(password, 10);
-  const info = db.prepare('INSERT INTO users (name, email, password_hash) VALUES (?,?,?)').run(name, email, hash);
-  const user = db.prepare('SELECT id, name, email, role FROM users WHERE id = ?').get(info.lastInsertRowid);
-  const token = signToken(user);
-  res.status(201).json({ user, token });
+  try {
+    const { name, email, password } = req.body || {};
+    if (!name || !email || !password) return res.status(400).json({ error: 'name, email, password required' });
+    const existing = db.prepare('SELECT id FROM users WHERE email = ?').get(email);
+    if (existing) return res.status(409).json({ error: 'Email already registered' });
+    const hash = bcrypt.hashSync(password, 10);
+    const info = db.prepare('INSERT INTO users (name, email, password_hash) VALUES (?,?,?)').run(name, email, hash);
+    const user = db.prepare('SELECT id, name, email, role FROM users WHERE id = ?').get(info.lastInsertRowid);
+    const token = signToken(user);
+    res.status(201).json({ user, token });
+  } catch (err) {
+    console.error('Register error:', err);
+    res.status(500).json({ error: err.message || 'Registration failed' });
+  }
 }
 
 export function login(req, res) {
