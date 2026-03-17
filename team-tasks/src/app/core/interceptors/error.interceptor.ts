@@ -58,8 +58,20 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
         error: error.error
       });
 
-      // החזר error עם הודעה ברורה
-      return throwError(() => new Error(errorMessage));
+      const normalizedBody =
+        error.error && typeof error.error === 'object'
+          ? { ...error.error, message: (error.error as any).message || errorMessage }
+          : { message: errorMessage };
+
+      const normalizedError = new HttpErrorResponse({
+        error: normalizedBody,
+        headers: error.headers,
+        status: error.status,
+        statusText: error.statusText,
+        url: error.url ?? undefined
+      });
+
+      return throwError(() => normalizedError);
     })
   );
 };

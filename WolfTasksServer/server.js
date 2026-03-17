@@ -45,7 +45,8 @@ app.get('*', (_req, res) => {
 // Error handler
 app.use((err, _req, res, _next) => {
   console.error(err);
-  res.status(err.status || 500).json({ error: err.message || 'Server error' });
+  const message = err.message || 'Server error';
+  res.status(err.status || 500).json({ message, error: message });
 });
 
 const PORT = process.env.PORT || 3000;
